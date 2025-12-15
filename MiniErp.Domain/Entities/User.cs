@@ -1,11 +1,22 @@
-using MiniErp.Domain.Enums;
-
 namespace MiniErp.Domain.Entities;
 
 public class User
 {
-    public Guid Id { get; set; }
-    public string Email { get; set; } = default!;
-    public string Password { get; set; } = default!;
-    public RoleName Role { get; set; }
+    public Guid Id { get; private set; }
+    public string Email { get; private set; }
+    public string Password { get; private set; }
+
+    public Guid RoleId { get; private set; }
+    public Role Role { get; private set; }
+
+    protected User() { }
+
+    public User(string email, string password, Role role)
+    {
+        Id = Guid.NewGuid();
+        Email = email;
+        Password = password;
+        Role = role;
+        RoleId = role.Id;
+    }
 }

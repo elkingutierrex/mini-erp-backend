@@ -1,0 +1,16 @@
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\bin\Debug\net10.0\MiniErp.Application.deps.json
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\bin\Debug\net10.0\MiniErp.Application.dll
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\bin\Debug\net10.0\MiniErp.Application.pdb
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\bin\Debug\net10.0\MiniErp.Domain.dll
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\bin\Debug\net10.0\MiniErp.Domain.pdb
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.csproj.AssemblyReference.cache
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.AssemblyInfoInputs.cache
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.AssemblyInfo.cs
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.csproj.CoreCompileInputs.cache
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.sourcelink.json
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp..8020D044.Up2Date
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.dll
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\refint\MiniErp.Application.dll
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\MiniErp.Application.pdb
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Application\obj\Debug\net10.0\ref\MiniErp.Application.dll

@@ -24,13 +24,4 @@ public class Sale
     {
         _items.Add(item);
     }
-
-    public void RemoveItem(Guid itemId)
-    {
-        var item = _items.FirstOrDefault(i => i.Id == itemId);
-        if (item != null)
-        {
-            _items.Remove(item);
-        }
-    }
 }

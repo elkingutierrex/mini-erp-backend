@@ -7,37 +7,80 @@ public static class DbSeeder
 {
     public static void Seed(AppDbContext context)
     {
-        if (context.Users.Any()) return;
+        if (context.Users.Any())
+            return;
 
-        var canCreateSale = new Permission { Name = "CanCreateSale" };
-        var canViewAllSales = new Permission { Name = "CanViewAllSales" };
-        var canManageRoles = new Permission { Name = "CanManageRoles" };
+        // --------------------
+        // Permissions
+        // --------------------
+        var canCreateSale = new Permission("CanCreateSale");
+        var canViewAllSales = new Permission("CanViewAllSales");
+        var canManageRoles = new Permission("CanManageRoles");
 
-        var sellerRole = new Role
-        {
-            Name = RoleName.seller,
-            Permissions = new() { canCreateSale }
-        };
+        context.Permissions.AddRange(
+            canCreateSale,
+            canViewAllSales,
+            canManageRoles
+        );
 
-        var adminRole = new Role
-        {
-            Name = RoleName.admin,
-            Permissions = new() { canViewAllSales }
-        };
+        // --------------------
+        // Roles
+        // --------------------
+        var sellerRole = new Role(RoleName.seller);
+        sellerRole.AddPermission(canCreateSale);
 
-        var managerRole = new Role
-        {
-            Name = RoleName.manager,
-            Permissions = new() { canCreateSale, canViewAllSales, canManageRoles }
-        };
+        var adminRole = new Role(RoleName.admin);
+        adminRole.AddPermission(canCreateSale);
+        adminRole.AddPermission(canViewAllSales);
+
+        var managerRole = new Role(RoleName.manager);
+        managerRole.AddPermission(canCreateSale);
+        managerRole.AddPermission(canViewAllSales);
+        managerRole.AddPermission(canManageRoles);
 
         context.Roles.AddRange(sellerRole, adminRole, managerRole);
 
-        context.Users.AddRange(
-            new User { Email = "seller@erp.test", Password = "seller", Role = RoleName.seller },
-            new User { Email = "admin@erp.test", Password = "admin", Role = RoleName.admin },
-            new User { Email = "manager@erp.test", Password = "manager", Role = RoleName.manager }
+        // --------------------
+        // Users
+        // --------------------
+        var sellerUser = new User(
+            "seller@demo.com",
+            "seller123",
+            sellerRole
         );
+
+        var adminUser = new User(
+            "admin@demo.com",
+            "admin123",
+            adminRole
+        );
+
+        var managerUser = new User(
+            "manager@demo.com",
+            "manager123",
+            managerRole
+        );
+
+        context.Users.AddRange(
+            sellerUser,
+            adminUser,
+            managerUser
+        );
+
+        // --------------------
+        // Products
+        // --------------------
+        var products = new List<Product>
+        {
+            new Product("Laptop", 3500),
+            new Product("Mouse", 80),
+            new Product("Keyboard", 150),
+            new Product("Monitor", 900),
+            new Product("Headphones", 200),
+            new Product("USB Cable", 30)
+        };
+
+        context.Products.AddRange(products);
 
         context.SaveChanges();
     }

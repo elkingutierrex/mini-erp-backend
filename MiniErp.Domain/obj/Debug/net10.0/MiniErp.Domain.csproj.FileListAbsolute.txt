@@ -1,0 +1,12 @@
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\bin\Debug\net10.0\MiniErp.Domain.deps.json
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\bin\Debug\net10.0\MiniErp.Domain.dll
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\bin\Debug\net10.0\MiniErp.Domain.pdb
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\MiniErp.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\MiniErp.Domain.AssemblyInfoInputs.cache
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\MiniErp.Domain.AssemblyInfo.cs
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\MiniErp.Domain.csproj.CoreCompileInputs.cache
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\MiniErp.Domain.sourcelink.json
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\MiniErp.Domain.dll
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\refint\MiniErp.Domain.dll
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\MiniErp.Domain.pdb
+D:\projects\personalProjects\bwt\mini-erp-backend\MiniErp.Domain\obj\Debug\net10.0\ref\MiniErp.Domain.dll

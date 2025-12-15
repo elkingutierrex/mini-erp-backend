@@ -20,9 +20,4 @@ public class SaleItem
         UnitPrice = unitPrice;
         Quantity = quantity;
     }
-
-    public void UpdateQuantity(int quantity)
-    {
-        Quantity = quantity;
-    }
 }

@@ -16,15 +16,4 @@ public class Product
         Price = price;
         IsActive = true;
     }
-
-    public void Update(string name, decimal price)
-    {
-        Name = name;
-        Price = price;
-    }
-
-    public void Deactivate()
-    {
-        IsActive = false;
-    }
 }
