@@ -6,7 +6,7 @@ using MiniErp.Domain.Entities;
 namespace MiniErp.Api.Controllers;
 
 [ApiController]
-[Route("api/roles")]
+[Route("api/[controller]")]
 public class RolesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -18,13 +18,15 @@ public class RolesController : ControllerBase
 
     // GET: api/roles
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetRoles()
     {
         var roles = await _context.Roles
+            .Include(r => r.Permissions)
             .Select(r => new
             {
                 r.Id,
-                r.Name
+                r.Name,
+                Permissions = r.Permissions.Select(p => p.Name)
             })
             .ToListAsync();
 
@@ -33,9 +35,11 @@ public class RolesController : ControllerBase
 
     // GET: api/roles/{id}
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetRoleById(Guid id)
     {
-        var role = await _context.Roles.FindAsync(id);
+        var role = await _context.Roles
+            .Include(r => r.Permissions)
+            .FirstOrDefaultAsync(r => r.Id == id);
 
         if (role == null)
             return NotFound();
@@ -43,74 +47,37 @@ public class RolesController : ControllerBase
         return Ok(new
         {
             role.Id,
-            role.Name
+            role.Name,
+            Permissions = role.Permissions.Select(p => p.Name)
         });
     }
 
-    // POST: api/roles
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateRoleRequest request)
+    // PUT: api/roles/{id}/permissions
+    [HttpPut("{id:guid}/permissions")]
+    public async Task<IActionResult> UpdateRolePermissions(
+        Guid id,
+        [FromBody] List<string> permissions)
     {
-        var exists = await _context.Roles
-            .AnyAsync(r => r.Name == request.Name);
+        var role = await _context.Roles
+            .Include(r => r.Permissions)
+            .FirstOrDefaultAsync(r => r.Id == id);
 
-        if (exists)
-            return BadRequest("Role already exists");
+        if (role == null)
+            return NotFound("Role not found");
 
-        var role = new Role(request.Name);
+        var dbPermissions = await _context.Permissions
+            .Where(p => permissions.Contains(p.Name))
+            .ToListAsync();
 
-        _context.Roles.Add(role);
-        await _context.SaveChangesAsync();
+        role.Permissions.Clear();
 
-        return CreatedAtAction(nameof(GetById), new { id = role.Id }, new
+        foreach (var permission in dbPermissions)
         {
-            role.Id,
-            role.Name
-        });
-    }
-
-    // PUT: api/roles/{id}
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, UpdateRoleRequest request)
-    {
-        var role = await _context.Roles.FindAsync(id);
-
-        if (role == null)
-            return NotFound();
-
-        role.Update(request.Name);
+            role.Permissions.Add(permission);
+        }
 
         await _context.SaveChangesAsync();
 
         return NoContent();
     }
-
-    // DELETE: api/roles/{id}
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        var role = await _context.Roles.FindAsync(id);
-
-        if (role == null)
-            return NotFound();
-
-        _context.Roles.Remove(role);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
 }
-
-#region DTOs
-
-public class CreateRoleRequest
-{
-    public string Name { get; set; } = string.Empty;
-}
-
-public class UpdateRoleRequest
-{
-    public string Name { get; set; } = string.Empty;
-}
-
-#endregion

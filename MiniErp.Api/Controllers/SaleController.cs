@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniErp.Infrastructure.Persistence;
 using MiniErp.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MiniErp.Api.Controllers;
 
