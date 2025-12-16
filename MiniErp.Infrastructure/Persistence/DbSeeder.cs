@@ -35,7 +35,6 @@ public static class DbSeeder
         };
 
         context.Permissions.AddRange(permissions);
-
         context.SaveChanges();
 
         // =======================
@@ -53,6 +52,21 @@ public static class DbSeeder
         };
 
         context.Users.AddRange(users);
+
+        // =======================
+        // PRODUCTS
+        // =======================
+
+        var products = new List<Product>
+        {
+            new Product("Computer", 10),
+            new Product("Mouse", 15),
+            new Product("Keyboard", 23),
+            new Product("Monitor", 7),
+            new Product("Headset", 50)
+        };
+
+        context.Products.AddRange(products);
 
         context.SaveChanges();
     }
