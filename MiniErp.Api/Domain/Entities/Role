@@ -1,0 +1,9 @@
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Domain.Entities;
+
+public class Role
+{
+    public int Id { get; set; }
+    public RoleName Name { get; set; }
+}

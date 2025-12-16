@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 namespace MiniErp.Api.Controllers;
 
 [ApiController]
-[Route("api/sales")]
+[Route("api/[controller]")]
+[Authorize]
 public class SalesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -19,6 +20,7 @@ public class SalesController : ControllerBase
 
     // POST: api/sales
     // Create a sale (Seller)
+    [Authorize(Policy = "CanCreateSale")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateSaleRequest request)
     {

@@ -1,79 +1,58 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using MiniErp.Api.DTOs;
+using MiniErp.Api.Contracts.Auth;
 using MiniErp.Infrastructure.Persistence;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using MiniErp.Infrastructure.Security;
+using Microsoft.EntityFrameworkCore;
 
 namespace MiniErp.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/auth")]
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly IConfiguration _configuration;
+    private readonly JwtTokenService _jwtService;
 
-    public AuthController(AppDbContext context, IConfiguration configuration)
+    public AuthController(AppDbContext context, JwtTokenService jwtService)
     {
         _context = context;
-        _configuration = configuration;
+        _jwtService = jwtService;
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<LoginResponseDto>> Login(LoginRequestDto request)
+    public async Task<IActionResult> Login([FromBody] AuthLoginRequest request)
     {
-        var user = await _context.Users
-            .Include(u => u.Role)
-                .ThenInclude(r => r.Permissions)
-            .FirstOrDefaultAsync(u =>
-                u.Email == request.Email &&
-                u.Password == request.Password);
-
-        if (user == null)
-            return Unauthorized("Invalid credentials");
-
-        var jwtSection = _configuration.GetSection("Jwt");
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSection["Key"]!));
-
-        var claims = new List<Claim>
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role.Name)
-        };
-
-        foreach (var permission in user.Role.Permissions)
-        {
-            claims.Add(new Claim("permission", permission.Name));
+            return BadRequest(new { message = "Email and password are required" });
         }
 
-        var tokenDescriptor = new SecurityTokenDescriptor
+        var user = await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u =>
+                u.Email == request.Email &&
+                u.Password == request.Password
+            );
+
+        if (user == null)
         {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddMinutes(
-                int.Parse(jwtSection["ExpiresInMinutes"]!)),
-            Issuer = jwtSection["Issuer"],
-            Audience = jwtSection["Audience"],
-            SigningCredentials = new SigningCredentials(
-                key,
-                SecurityAlgorithms.HmacSha256)
+            return Unauthorized(new { message = "Invalid credentials" });
+        }
+
+        var token = _jwtService.GenerateToken(user);
+
+        var response = new AuthLoginResponse
+        {
+            AccessToken = token,
+            ExpiresIn = 3600,
+            User = new AuthUserResponse
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = user.Role.Name
+            }
         };
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-
-        return Ok(new LoginResponseDto
-        {
-            Token = tokenHandler.WriteToken(token),
-            ExpiresAt = tokenDescriptor.Expires!.Value,
-            Role = user.Role.Name,
-            Permissions = user.Role.Permissions
-                .Select(p => p.Name)
-                .ToList()
-        });
+        return Ok(response);
     }
 }
