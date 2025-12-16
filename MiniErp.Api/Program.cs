@@ -1,7 +1,7 @@
 using MiniErp.Infrastructure.Persistence;
 using MiniErp.Infrastructure.Security;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -10,17 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 // =======================
 // CORS
 // =======================
-
 const string CorsPolicyName = "MiniErpCors";
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: CorsPolicyName, policy =>
+    options.AddPolicy(CorsPolicyName, policy =>
     {
         policy
             .WithOrigins(
-                "http://localhost:4200", // Angular
-                "http://localhost:5173"  // Vite / React
+                "http://localhost:4200",
+                "http://localhost:5173"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -30,36 +29,29 @@ builder.Services.AddCors(options =>
 // =======================
 // Controllers
 // =======================
-
 builder.Services.AddControllers();
 
 // =======================
 // Swagger
 // =======================
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // =======================
-// DB
+// Database
 // =======================
-
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseInMemoryDatabase("MiniErpDb");
 });
 
 // =======================
-// JWT
+// JWT Authentication
 // =======================
+var jwtConfig = builder.Configuration.GetSection("Jwt");
+var key = Encoding.UTF8.GetBytes(jwtConfig["Key"]!);
 
-builder.Services.AddScoped<JwtTokenService>();
-
-var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]!);
-
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -68,23 +60,22 @@ builder.Services
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
+            ValidIssuer = jwtConfig["Issuer"],
+            ValidAudience = jwtConfig["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(key)
         };
     });
 
 // =======================
-// App
+// Services
 // =======================
+builder.Services.AddScoped<JwtTokenService>();
 
 var app = builder.Build();
 
 // =======================
 // Middleware
 // =======================
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -93,10 +84,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// ⬅️ CORS primero
 app.UseCors(CorsPolicyName);
 
-// ⬅️ Auth
+// 🔥 ORDEN CORRECTO (MUY IMPORTANTE)
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -105,7 +95,6 @@ app.MapControllers();
 // =======================
 // Seed DB
 // =======================
-
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();

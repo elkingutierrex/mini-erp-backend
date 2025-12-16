@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MiniErp.Api.Contracts.Auth;
 using MiniErp.Infrastructure.Persistence;
 using MiniErp.Infrastructure.Security;
-using Microsoft.EntityFrameworkCore;
 
 namespace MiniErp.Api.Controllers;
 
@@ -19,10 +19,20 @@ public class AuthController : ControllerBase
         _jwtService = jwtService;
     }
 
+    // Mapeo simple Role -> Permissions (bajo ruido)
+    private static readonly Dictionary<string, string[]> RolePermissionsMap =
+        new()
+        {
+            ["seller"]  = new[] { "CanCreateSale" },
+            ["admin"]   = new[] { "CanViewAllSales" },
+            ["manager"] = new[] { "CanCreateSale", "CanViewAllSales", "CanManageRoles" }
+        };
+
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AuthLoginRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Password))
         {
             return BadRequest(new { message = "Email and password are required" });
         }
@@ -41,6 +51,12 @@ public class AuthController : ControllerBase
 
         var token = _jwtService.GenerateToken(user);
 
+        var roleName = user.Role.Name;
+
+        var permissions = RolePermissionsMap.TryGetValue(roleName, out var perms)
+            ? perms
+            : Array.Empty<string>();
+
         var response = new AuthLoginResponse
         {
             AccessToken = token,
@@ -49,7 +65,8 @@ public class AuthController : ControllerBase
             {
                 Id = user.Id,
                 Email = user.Email,
-                Role = user.Role.Name
+                Role = roleName,
+                Permissions = permissions
             }
         };
 
