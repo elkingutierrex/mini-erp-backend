@@ -64,7 +64,7 @@ public class SalesController : ControllerBase
     }
 
     // GET: api/sales/my
-    [HttpGet("my")]
+    [HttpGet("my-sales")]
     public async Task<IActionResult> GetMySales()
     {
         var userIdClaim =
