@@ -10,7 +10,7 @@ public class SaleItem
     public int Quantity { get; private set; }
     public decimal SubTotal { get; private set; }
 
-    private SaleItem() { } // EF Core
+    private SaleItem() { }
 
     public SaleItem(
         int productId,
