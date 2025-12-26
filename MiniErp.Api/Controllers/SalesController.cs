@@ -9,7 +9,7 @@ namespace MiniErp.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize] // mantiene seguridad con JWT
+[Authorize] 
 public class SalesController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -21,47 +21,39 @@ public class SalesController : ControllerBase
 
     // POST: api/sales
     // Cualquier usuario autenticado puede crear ventas
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateSaleRequest request)
+  public async Task<IActionResult> Create([FromBody] CreateSaleRequest request)
+{
+    if (request.Items.Count == 0)
+        return BadRequest("Sale must contain items");
+
+    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (string.IsNullOrEmpty(userIdClaim))
+        return Unauthorized();
+
+    var userId = Guid.Parse(userIdClaim);
+
+    var sale = new Sale(userId, request.Total);
+
+    foreach (var item in request.Items)
     {
-        // MEJOR PRÁCTICA: obtener el UserId desde el token
-        var userIdClaim =
-            User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrEmpty(userIdClaim))
-            return Unauthorized();
-
-        var userId = Guid.Parse(userIdClaim);
-
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
-        if (user == null)
-            return BadRequest("Invalid user");
-
-        var sale = new Sale(user);
-
-        foreach (var item in request.Items)
-        {
-            var product = await _context.Products
-                .FirstOrDefaultAsync(p => p.Id == item.ProductId);
-
-            if (product == null)
-                return BadRequest($"Product not found: {item.ProductId}");
-
-            sale.AddItem(product, item.Quantity);
-        }
-
-        _context.Sales.Add(sale);
-        await _context.SaveChangesAsync();
-
-        return Ok(new
-        {
-            sale.Id,
-            sale.CreatedAt,
-            sale.Total
-        });
+        sale.AddItemSnapshot(
+            item.ProductId,
+            item.Name,
+            item.Price,
+            item.Quantity
+        );
     }
+
+    _context.Sales.Add(sale);
+    await _context.SaveChangesAsync();
+
+    return Ok(new
+    {
+        sale.Id,
+        sale.CreatedAt,
+        sale.Total
+    });
+}
 
     // GET: api/sales/my
     [HttpGet("my-sales")]
@@ -122,11 +114,14 @@ public class SalesController : ControllerBase
 public class CreateSaleRequest
 {
     public List<CreateSaleItemRequest> Items { get; set; } = new();
+      public decimal Total { get; set; }
 }
 
 public class CreateSaleItemRequest
 {
-    public Guid ProductId { get; set; }
+    public int ProductId { get; set; }
+    public string Name { get; set; } = default!;
+    public decimal Price { get; set; }
     public int Quantity { get; set; }
 }
 

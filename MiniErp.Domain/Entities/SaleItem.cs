@@ -3,22 +3,25 @@ namespace MiniErp.Domain.Entities;
 public class SaleItem
 {
     public Guid Id { get; private set; }
-    public Guid SaleId { get; private set; }
-    public Guid ProductId { get; private set; }
-    public string ProductName { get; private set; }
+
+    public int ProductId { get; private set; }
+    public string ProductName { get; private set; } = default!;
     public decimal UnitPrice { get; private set; }
     public int Quantity { get; private set; }
     public decimal SubTotal { get; private set; }
 
-    protected SaleItem() { }
+    private SaleItem() { } // EF Core
 
-    public SaleItem(Product product, int quantity)
+    public SaleItem(
+        int productId,
+        string productName,
+        decimal unitPrice,
+        int quantity)
     {
-        Id = Guid.NewGuid();
-        ProductId = product.Id;
-        ProductName = product.Name;
-        UnitPrice = product.Price;
+        ProductId = productId;
+        ProductName = productName;
+        UnitPrice = unitPrice;
         Quantity = quantity;
-        SubTotal = product.Price * quantity;
+        SubTotal = unitPrice * quantity;
     }
 }
